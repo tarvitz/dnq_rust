@@ -24,10 +24,6 @@ pub struct Config {
 }
 
 impl Config {
-	pub fn new() -> Config {
-		Config{address: String::from("0.0.0.0:8443"), workers: 8}
-	}
-
 	pub fn from_env() -> Config {
 		Config {
 			address: E::with("DNQ_ADDRESS", String::from(DEFAULT_ADDR)).get(),
@@ -35,10 +31,11 @@ impl Config {
 		}
 	}
 
-	pub fn with_address(mut self, new_address: &str) -> Self {
-		self.address = String::from(new_address);
-		return self
-	}
+	// works but makes no sense
+	// pub fn with_address(mut self, new_address: &str) -> Self {
+	// 	self.address = String::from(new_address);
+	// 	return self
+	// }
 
 	//
 	// pub fn set_address(&mut self, new_address: &str) {
