@@ -1,7 +1,7 @@
 pub mod endpoints;
 pub mod utils;
 
-use std::env;
+use crate::utils::env::Env as E;
 
 static DEFAULT_ADDR: &str = "0.0.0.0:8443";
 
@@ -30,10 +30,8 @@ impl Config {
 
 	pub fn from_env() -> Config {
 		Config {
-			address: utils::Env::
-				with("DNQ_ADDRESS", String::from("0.0.0.0:8443")).get(),
-			workers: utils::Env::
-				with("DNQ_WORKERS", 8).get(),
+			address: E::with("DNQ_ADDRESS", String::from(DEFAULT_ADDR)).get(),
+			workers: E::with("DNQ_WORKERS", 8).get(),
 		}
 	}
 
@@ -42,7 +40,8 @@ impl Config {
 		return self
 	}
 
-	pub fn set_address(&mut self, new_address: &str) {
-		self.address = String::from(new_address);
-	}
+	//
+	// pub fn set_address(&mut self, new_address: &str) {
+	// 	self.address = String::from(new_address);
+	// }
 }

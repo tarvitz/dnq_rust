@@ -5,9 +5,9 @@ use std::str::FromStr;
 /// environment variables and set a default value on any issue
 /// # Example
 /// ```
-/// use dnq::utils::Env;
-/// let e = Env::new("TEST_VALUE", 1337u32);
-/// assert_eq!(1337u32, e.env());
+/// use dnq::utils::env::Env;
+/// let result = Env::with("TEST_VALUE", 1337u32).get();
+/// assert_eq!(1337u32, result);
 /// ```
 pub struct Env<'a, T>
 	where T: FromStr {
@@ -43,8 +43,8 @@ impl <'a, T> Env<'a, T>
 
 #[cfg(test)]
 mod unit_tests {
-	use std::env as stdenv;
 	use crate::utils::Env;
+	use crate::utils::tests::WithEnv;
 
 	#[test]
 	fn test_env_from_string_default(){
@@ -54,24 +54,24 @@ mod unit_tests {
 
 	#[test]
 	fn test_env_from_string_env(){
-		let e = Env::with("test", String::from("default"));
-		assert_eq!(String::from("default"), e.get());
+		WithEnv::set("TEST_VALUE", "just a string value").run(||{
+			assert_eq!(String::from("just a string value"),
+								 Env::with("TEST_VALUE", String::from("default")).get());
+		});
 	}
 
 	#[test]
 	fn test_env_from_i32(){
-		let env_var:&str = "TEST_VALUE";
-		stdenv::set_var(&env_var, "1337");
-		let e = Env::with(&env_var, 1337);
-		stdenv::remove_var(&env_var);
-		assert_eq!(1337, e.get());
+		WithEnv::set("TEST_VALUE", "1337").run(||{
+			let e = Env::with("TEST_VALUE", 1337);
+			assert_eq!(1337, e.get());
+		});
 	}
 
 	#[test]
 	fn test_env_from_i32_chain(){
-		let env_var:&str = "TEST_VALUE";
-		stdenv::set_var(&env_var, "1337");
-		assert_eq!(1337, Env::with("TEST_VALUE", 1337i32).get());
-		stdenv::remove_var(&env_var);
+		WithEnv::set("TEST_VALUE", "1337").run(||{
+			assert_eq!(1337, Env::with("TEST_VALUE", 1337i32).get());
+		});
 	}
 }
