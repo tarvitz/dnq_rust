@@ -1,0 +1,12 @@
+[package]
+name = "dnq"
+version = "0.1.0"
+edition = "2021"
+description = "Duke Nukem Quotes on Rust"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+telegram = {path = "telegram"}
+env_logger = "0.10.0"
+log = "0.4.20"
