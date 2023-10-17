@@ -10,4 +10,11 @@ description = "Duke Nukem Quotes on Rust"
 telegram = {path = "telegram"}
 env_logger = "0.10.0"
 log = "0.4.20"
-actix-web = "4"
+# without TLS/SSL
+actix-web = {version = "4"}
+#: with TLS/SSL
+# actix-web = { version = "4", features = ["openssl"] }
+# openssl = {version = "0.10"}
+
+#[features]
+#default = ["nossl"]

@@ -1,22 +1,31 @@
-use actix_web::{get, App, HttpServer, Responder, HttpResponse};
+use dnq;
 
-#[get("/")]
-async fn hello() -> impl Responder {
-	HttpResponse::Ok().body("Hello world!")
-}
+use actix_web::{App, HttpServer};
+use log::{info};
 
-#[get("/readyz")]
-async fn readyz() -> impl Responder {
-	HttpResponse::Ok().body("ok")
-}
+/*
+#[cfg(feature = "openssl")]
+	{
+		let builder = tls();
+		server.bind_openssl(address.as_str(), builder)?;
+	}
+*/
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> std::io::Result<()>{
+	env_logger::init();
+
+	let config = dnq::Config::from_env();
+
+	info!("starting a webserver at {}", config.address.as_str());
+
 	HttpServer::new(||{
 		App::new()
-			.service(hello)
-			.service(readyz)
+			.service(dnq::endpoints::hello)
+			.service(dnq::endpoints::readyz)
 	})
 		.workers(8)
-		.bind("0.0.0.0:8443")?.run().await
+		.bind(config.address.as_str())?
+		.run()
+		.await
 }
