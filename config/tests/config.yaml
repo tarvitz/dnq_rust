@@ -1,0 +1,23 @@
+#: ids has been cut intentionally
+admin_token: thisIsSecret
+quotes:
+  - id: AwACAgIAAxkDAAMRX3
+    caption: "Come get some!"
+    matches: ["come", "get", "some", "come get some", ""]
+
+  - id: AwACAgIAAxkDAAMJX2
+    caption: Groovy!
+    matches:
+      - groovy
+
+  - id: AwACAgIAAxkDAAMgX3
+    caption: I've got a bad feeling about this
+    matches:
+      - bad
+      - feeling
+
+  - id: AwACAgIAAxkDAAMhX3
+    caption: Now I've got really bad feeling about this
+    matches:
+      - bad
+      - feeling

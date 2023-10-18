@@ -8,6 +8,7 @@ description = "Duke Nukem Quotes on Rust"
 
 [dependencies]
 telegram = {path = "telegram"}
+config = {path = "config"}
 env_logger = "0.10.0"
 log = "0.4.20"
 # without TLS/SSL
