@@ -8,7 +8,9 @@ pub struct Error<'a> {
 // Quote -> telegram
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Quote {
-
+	pub id: String,
+	pub caption: String,
+	pub matches: Vec<String>,
 }
 
 // note fields should have exact names like they represented in structs
@@ -43,6 +45,7 @@ mod test_config {
 		if let Ok(config) = Config::from_file(CONFIG_LOCATION){
 			assert_eq!(String::from("thisIsSecret"), config.admin_token);
 			assert_eq!(4, config.quotes.len());
+			assert_eq!(String::from("AwACAgIAAxkDAAMRX3"), config.quotes[0].id);
 			return
 		};
 		panic_any("could not deserialize the config");
