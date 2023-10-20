@@ -1,16 +1,30 @@
-use std::fs;
+use std::{fs, vec};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
+
+
+const DEFAULT_QUOTE_ID: &str = "AwACAgIAAxkDAAMWX3okXL1AZ-aOQTpL2t-7tExt2YIAArMIAAJgG9BLmWJEVGtI5hwbBA";
 
 pub struct Error<'a> {
 	pub message: &'a str,
 }
 
 // Quote -> telegram
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Quote {
 	pub id: String,
 	pub caption: String,
 	pub matches: Vec<String>,
+}
+
+impl Clone for Quote {
+	fn clone(&self) -> Self {
+		return Quote{
+			id: self.id.clone(),
+			caption: self.caption.clone(),
+			matches: self.matches.clone(),
+		}
+	}
 }
 
 // note fields should have exact names like they represented in structs
@@ -31,6 +45,34 @@ impl Config {
 		}
 		return Err(Error { message: "could get config" })
 	}
+
+	// TODO: probably there's a way to find a way without cloning?
+	pub fn random_quote(&self) -> Quote {
+		let len= self.quotes.len();
+		if len == 0 {
+			return default_quote();
+		}
+		if len == 1 {
+			return self.quotes.get(0).unwrap().clone();
+		}
+
+		let idx = rand::thread_rng().gen_range(0..len-1);
+		match self.quotes.get(idx){
+			Some(v) => {
+				return v.clone();
+			},
+			_ => default_quote(),
+		}
+	}
+}
+
+// helpers
+fn default_quote() -> Quote {
+	Quote{
+		id: String::from(DEFAULT_QUOTE_ID),
+		caption: String::from("What the ..?"),
+		matches: vec![],
+	}
 }
 
 #[cfg(test)]
@@ -39,6 +81,14 @@ mod test_config {
 	use super::*;
 
 	const CONFIG_LOCATION: &str = "tests/config.yaml";
+
+	// helpers
+	fn _make_blank_config() -> Config {
+		Config {
+			quotes: vec![],
+			admin_token: String::from("thisIsSecret"),
+		}
+	}
 
 	#[test]
 	fn from_file() {
@@ -58,5 +108,35 @@ mod test_config {
 			return
 		};
 		panic_any("didn't return an error");
+	}
+
+	#[test]
+	fn test_random_quote_blank() {
+		let config = _make_blank_config();
+		// let quote = *config.random_quote().deref();
+		let quote = config.random_quote();
+		assert_eq!(default_quote(), quote);
+	}
+
+	#[test]
+	fn test_random_quote_non_blank() {
+		let mut config = _make_blank_config();
+		config.quotes.push(Quote{
+			id: String::from("1"),
+			caption: String::from("2"),
+			matches: vec![],
+		});
+
+		let quote = config.random_quote();
+		assert_ne!(default_quote(), quote);
+
+		config.quotes.push(Quote{
+			id: String::from("2"),
+			caption: String::from("1"),
+			matches: vec![],
+		});
+
+		let quote = config.random_quote();
+		assert_ne!(default_quote(), quote);
 	}
 }
