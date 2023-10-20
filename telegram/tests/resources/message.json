@@ -1,0 +1,30 @@
+{
+  "update_id": 292124765,
+  "message": {
+    "message_id": 54,
+    "from": {
+      "id": 1337,
+      "is_bot": false,
+      "first_name": "Nickolas",
+      "last_name": "F.",
+      "username": "nickolasfox",
+      "language_code": "ru"
+    },
+    "chat": {
+      "id": 1337,
+      "first_name": "Nickolas",
+      "last_name": "F.",
+      "username": "nickolasfox",
+      "type": "private"
+    },
+    "date": 1602542658,
+    "text": "/help",
+    "entities": [
+      {
+        "offset": 0,
+        "length": 5,
+        "type": "bot_command"
+      }
+    ]
+  }
+}

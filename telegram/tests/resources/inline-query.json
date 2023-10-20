@@ -1,0 +1,16 @@
+{
+  "update_id": 292124505,
+  "inline_query": {
+    "id": "600597106931592670",
+    "from": {
+      "id": 1337,
+      "is_bot": false,
+      "first_name": "Nickolas",
+      "last_name": "F.",
+      "username": "nickolasfox",
+      "language_code": "ru"
+    },
+    "query": "groovy",
+    "offset": ""
+  }
+}

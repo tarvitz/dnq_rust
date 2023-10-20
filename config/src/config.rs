@@ -67,7 +67,7 @@ impl Config {
 }
 
 // helpers
-fn default_quote() -> Quote {
+pub fn default_quote() -> Quote {
 	Quote{
 		id: String::from(DEFAULT_QUOTE_ID),
 		caption: String::from("What the ..?"),

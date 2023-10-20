@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "result": {
+    "message_id": 21,
+    "from": {
+      "id": 1336610694,
+      "is_bot": true,
+      "first_name": "Duke Nukem Quotes",
+      "username": "duqe_bot"
+    },
+    "chat": {
+      "id": 1337101,
+      "first_name": "Nickolas",
+      "last_name": "F.",
+      "username": "nickolasfox",
+      "type": "private"
+    },
+    "date": 1601814267,
+    "voice": {
+      "duration": 2,
+      "mime_type": "audio/ogg",
+      "file_id": "AwACAgIAAxkDAAMVX3m--xYKLFLzyvr54__SS5DDJGAAAi4IAAJgG9BLwR3pDPW5EM4bBA",
+      "file_unique_id": "AgADLggAAmAb0Es",
+      "file_size": 27275
+    }
+  }
+}
