@@ -1,8 +1,11 @@
 use std::collections::HashMap;
+use std::sync::{Mutex, Once};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-// static mut QUOTES: HashMap<&str, Vec<&Quote>> = HashMap::new();
+static mut QUOTES: Option<Mutex<HashMap<&str, Vec<Quote>>>> = None;
+static INIT: Once = Once::new();
+
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Response {
@@ -101,6 +104,16 @@ pub struct Quote {
 	pub matches: Vec<String>,
 }
 
+// init runs initialization call
+fn quotes<'a>() -> &'static Mutex<HashMap<&'a str, Vec<Quote>>>{
+	INIT.call_once(||{
+		unsafe {
+			QUOTES = Some(Mutex::new(HashMap::new()));
+		}
+	});
+	unsafe { QUOTES.as_ref().unwrap() }
+}
+
 pub fn new_answer_inline(update: &Update) -> AnswerInline {
 	let mut id:String = String::new();
 	if let Some(q) = &update.inline_query {
@@ -113,17 +126,17 @@ pub fn new_answer_inline(update: &Update) -> AnswerInline {
 }
 
 fn new_inline_query_result_cached_voice(update: &Update) -> Vec<AnswerInlineResult> {
-	let mut query: String = String::new();
+	let mut query: String = String::from(".X");
 	if let Some(q) = &update.inline_query {
 		query = q.query.to_lowercase();
 	}
-	// let query = update.inline_query.unwrap().query.to_lowercase().as_str();
 	let mut results:Vec<AnswerInlineResult> = vec![];
-	let quotes: HashMap<&str, Vec<Quote>> = HashMap::new();
+	let quotes = quotes().lock().unwrap();
+	// let quotes: HashMap<&str, Vec<Quote>> = HashMap::new();
 	let mut q: Option<&Vec<Quote>> = None;
 
-	if quotes.contains_key(&query.as_str()) {
-		q = quotes.get("");
+	if !quotes.contains_key(&query.as_str()) {
+		q = quotes.get(""); // default quote
 	} else {
 		q = quotes.get(&query.as_str());
 	}
@@ -153,8 +166,38 @@ pub fn set_quotes(quotes: Vec<Quote>) {
 
 #[cfg(test)]
 mod unit_tests {
+	use crate::objects::{InlineQuery, new_inline_query_result_cached_voice, Quote, quotes, Update};
+
 	#[test]
 	fn setup(){
 		assert!(true);
+	}
+
+	// TODO: think about how to keep global quotes.
+	#[test]
+	fn test_new_inline_query_result_cached_voice(){
+		{
+			let mut quotes = quotes().lock().unwrap();
+
+			quotes.insert("hehe", vec![Quote {
+				id: String::from("test"),
+				caption: String::from("value"),
+				matches: vec![String::from("hehe")]
+			}]);
+		}
+
+		let update = Update{
+			id: 1337,
+			inline_query: Some(InlineQuery{
+				id: String::from("133733"),
+				query: String::from("hehe"),
+				from: None,
+				offset: String::new(),
+			}),
+			message: None,
+		};
+
+		let answer = new_inline_query_result_cached_voice(&update);
+		assert_eq!(1, answer.len(), "answer should be have one item");
 	}
 }
