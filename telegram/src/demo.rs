@@ -1,4 +1,6 @@
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
 struct Container<'a> {
 	id: &'a str,
 	contents: Vec<&'a str>
@@ -36,5 +38,15 @@ mod unit_tests {
 		];
 		let map = copy(map, sources);
 		assert_eq!(2, map.len());
+	}
+
+	#[test]
+	fn from_string(){
+		let raw = String::from(r#"
+id: "this is the test"
+contents: ["test", "me"]
+"#);
+		let obj:Container = serde_yaml::from_str(raw.as_str()).unwrap();
+		println!("This is container: {:?}", obj);
 	}
 }
