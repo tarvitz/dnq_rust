@@ -111,7 +111,7 @@ fn quotes<'a>() -> &'static Mutex<HashMap<&'a str, Vec<Quote<'static>>>>{
 			QUOTES = Some(Mutex::new(HashMap::new()));
 		}
 	});
-	unsafe { QUOTES.as_ref().unwrap() }
+	unsafe { QUOTES.as_ref().unwrap() } // remote Option
 }
 
 pub fn new_answer_inline(update: &Update) -> AnswerInline {
