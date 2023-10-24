@@ -1,4 +1,4 @@
-use crate::objects::{AnswerInlineResult};
+// use crate::objects::{AnswerInlineResult};
 
 pub struct Inline {}
 
