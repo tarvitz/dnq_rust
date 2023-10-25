@@ -1,13 +1,18 @@
 use std::io::Read;
-use ureq::Error;
+use serde::Deserialize;
+use crate::objects::Update;
 
 mod objects;
 mod services;
 mod demo;
 
-pub const BOT_API_URL: &str = "http://localhost:8085/bot"; // "https://api.telegram.org/bot";
+pub const BOT_API_URL: &str = "http://localhost:3000/bot"; // "https://api.telegram.org/bot";
 
 pub const HTTP_200_OK: u16 = 200;
+
+enum Error {
+	NoContents,
+}
 
 enum Method{
 	AnswerInlineQuery,
@@ -50,12 +55,24 @@ impl Client {
 
 		match resp {
 			Ok(response) => {
-				if response.status() == HTTP_200_OK {
-					println!("ok")
+				if response.status() != HTTP_200_OK {
+					return Err(Error::NoContents);
 				}
+				println!("ok");
+				let result: Update = serde_yaml::from_reader(response.into_reader()).unwrap();
+				println!("result: {:?}", result);
 				Ok(())
+				// let mut update = Update::default();
+				// let result = serde_yaml::from_reader(response.into_reader());
+				//
+				// match result{
+				// 	Ok(u) => return Ok(Box::new(u)),
+				// 	Err(_) => return Error::NoContents,
+				// }
+				// // Box::new(update)
+				// // Ok(Box::new(update))
 			}
-			Err(e) => Err(e),
+			Err(e) => Err(Error::NoContents),
 		}
 		// Ok(())
 	}
@@ -65,6 +82,7 @@ impl Client {
 mod unit_tests {
 	use stringreader::StringReader;
 	use crate::{BOT_API_URL, Client, Method, Request};
+	use crate::objects::Update;
 
 	#[test]
 	fn test_client_new(){
@@ -72,10 +90,10 @@ mod unit_tests {
 		assert_eq!(BOT_API_URL, client.api_url.as_str());
 	}
 
-	#[ignore]
+	#[ignore] // at the present moment this test runs on top of mockoon running side-server.
 	#[test] // works but disabled
 	fn test_client_call(){
-		let client = Client::new("this is a test");
+		let client = Client::new("secrettoken");
 		let request = Request{
 			body: StringReader::new("this is a test"),
 			method: Method::AnswerInlineQuery,

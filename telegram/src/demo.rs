@@ -1,3 +1,4 @@
+use std::io::Read;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -48,5 +49,63 @@ contents: ["test", "me"]
 "#);
 		let obj:Container = serde_yaml::from_str(raw.as_str()).unwrap();
 		println!("This is container: {:?}", obj);
+	}
+}
+
+#[derive(Debug)]
+struct Error {
+	message: String,
+}
+
+struct Request<'a, R> where R:Read {
+	method: &'a str,
+	body: R,
+}
+
+struct Poster<'a> {
+	api_url: &'a str,
+	token: &'a str,
+}
+
+impl <'a>Poster<'a> {
+
+	fn endpoint(&self, method: &str) -> String {
+		return format!("{}{}/{}", self.api_url, self.token, method)
+	}
+
+	fn call<T:Serialize + for<'de> Deserialize<'de>, R:Read>(&self, request: Request<R>) -> Result<T, Error> {
+		let result = ureq::post(self.endpoint(request.method).as_str())
+			.send(request.body);
+
+		match result {
+			Ok(response) => {
+				let res= serde_yaml::from_reader(response.into_reader());
+				match res {
+					Ok(obj) => return Ok(obj),
+					Err(_) => return Err(Error{message: String::from("issue")}),
+				}
+			},
+			Err(e) => return Err(Error{message: String::from("kek")}),
+		};
+	}
+}
+
+#[cfg(test)]
+mod unit_tests_two {
+	use stringreader::StringReader;
+	use crate::objects::Update;
+	use super::*;
+
+	#[test]
+	fn test_call_one() {
+		let client = Poster{api_url: "http://localhost:3000/bot", token: "secrettoken"};
+		let body = StringReader::new("this is a test");
+		let result: Result<Update, Error> = client.call(Request{body, method: "answerInlineQuery"});
+		match result {
+			Ok(update) => {
+				assert_eq!(292124505, update.id)
+			},
+			_ => assert!(false, "got issue"),
+		}
 	}
 }

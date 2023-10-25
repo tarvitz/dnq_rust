@@ -26,9 +26,9 @@ pub struct Message {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct From {
-	#[serde(alias = "message_id")]
 	pub id: i64,
-	pub r#type: String,
+	#[serde(alias = "type")]
+	pub r#type: Option<String>,
 	pub is_bot: bool,
 	pub first_name: String,
 	pub last_name: String,
@@ -53,7 +53,7 @@ pub enum UpdateType {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Update {
-	#[serde(alias = "message_id")]
+	#[serde(alias = "update_id")]
 	pub id: i64,
 	pub message: Option<Message>,
 	pub inline_query: Option<InlineQuery>,
@@ -69,6 +69,14 @@ impl Update {
 		}
 
 		UpdateType::Unknown
+	}
+
+	pub fn default() -> Update {
+		Update{
+			id: 0,
+			message: None,
+			inline_query: None,
+		}
 	}
 }
 
