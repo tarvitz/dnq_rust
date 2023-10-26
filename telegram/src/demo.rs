@@ -77,15 +77,15 @@ impl <'a>Poster<'a> {
 		let result = ureq::post(self.endpoint(request.method).as_str())
 			.send(request.body);
 
-		match result {
+		return match result {
 			Ok(response) => {
-				let res= serde_yaml::from_reader(response.into_reader());
+				let res = serde_yaml::from_reader(response.into_reader());
 				match res {
-					Ok(obj) => return Ok(obj),
-					Err(_) => return Err(Error{message: String::from("issue")}),
+					Ok(obj) => Ok(obj),
+					Err(_) => Err(Error { message: String::from("issue") }),
 				}
 			},
-			Err(e) => return Err(Error{message: String::from("kek")}),
+			Err(_) => Err(Error { message: String::from("kek") }),
 		};
 	}
 }
@@ -105,7 +105,7 @@ mod unit_tests_two {
 			Ok(update) => {
 				assert_eq!(292124505, update.id)
 			},
-			_ => assert!(false, "got issue"),
+			Err(e) => assert!(false, "{}", format!("got issue: {}", e.message)),
 		}
 	}
 }

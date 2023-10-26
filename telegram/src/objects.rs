@@ -116,7 +116,14 @@ pub struct Quote<'a> {
 fn quotes<'a>() -> &'static Mutex<HashMap<&'a str, Vec<Quote<'static>>>>{
 	INIT.call_once(||{
 		unsafe {
-			QUOTES = Some(Mutex::new(HashMap::new()));
+			let mut quotes: HashMap<&'a str, Vec<Quote>> = HashMap::new();
+			// add default
+			quotes.insert("", vec![Quote{
+				id: "AwACAgIAAxkDAAMRX3J5RTS6ijieWbCFrX68h8-o4ZoAAg8HAAKguZhLPoXn4iWWE2QbBA",
+				caption: "Come get some!",
+				matches: vec!["come", "get", "some", "come get some", ""],
+			}]);
+			QUOTES = Some(Mutex::new(quotes));
 		}
 	});
 	unsafe { QUOTES.as_ref().unwrap() } // remote Option

@@ -1,13 +1,12 @@
 use std::io::Read;
 use serde::{Deserialize, Serialize};
-use crate::objects::Update;
 
 mod objects;
-mod services;
 mod demo;
+mod services;
 
 pub const BOT_API_URL: &str = "https://api.telegram.org/bot";
-
+pub const CONTENT_TYPE_DEFAULT: &str = "application/json";
 pub const HTTP_200_OK: u16 = 200;
 
 enum Error {
@@ -21,12 +20,20 @@ enum Method{
 struct Request<R> where R: Read {
 	method: Method,
 	body: R,
+	expected_status: u16,
 }
 
 impl <R>Request<R> where R: Read {
 	fn endpoint<'a>(&self) -> &'a str {
 		match self.method {
 			Method::AnswerInlineQuery => "answerInlineQuery",
+		}
+	}
+
+	fn new(method: Method, body: R) -> Request<R>{
+		Request{
+			method, body,
+			expected_status: HTTP_200_OK,
 		}
 	}
 }
@@ -50,12 +57,12 @@ impl Client {
 
 	fn call<T:Serialize + for<'de> Deserialize<'de>, R:Read>(&self, request: Request<R>) -> Result<T, Error>{
 		let resp = ureq::post(self.url(request.endpoint()).as_str())
-			.set("Content-Type", "application/json")
+			.set("Content-Type", CONTENT_TYPE_DEFAULT)
 			.send(request.body);
 
 		match resp {
 			Ok(response) => {
-				if response.status() != HTTP_200_OK {
+				if response.status() != request.expected_status {
 					return Err(Error::NoContents);
 				}
 
@@ -65,7 +72,7 @@ impl Client {
 					Err(_) => Err(Error::NoContents),
 				}
 			}
-			Err(e) => Err(Error::NoContents),
+			Err(_) => Err(Error::NoContents),
 		}
 	}
 }
@@ -90,13 +97,13 @@ mod unit_tests {
 		let mut client = Client::new("secrettoken");
 		client.api_url = String::from("http://localhost:3000/bot");
 
-		let request = Request{
-			body: StringReader::new("this is a test"),
-			method: Method::AnswerInlineQuery,
-		};
+		let request = Request::new(
+			Method::AnswerInlineQuery,
+			StringReader::new("this is a test"));
+
 		let result: Result<Update, Error> = client.call(request);
 		match result {
-			Err(e) => assert!(false, "should not return an issue"),
+			Err(_) => assert!(false, "should not return an issue"),
 			Ok(update) => assert_eq!(292124505, update.id),
 		}
 	}
