@@ -11,6 +11,9 @@ pub const HTTP_200_OK: u16 = 200;
 
 enum Error {
 	NoContents,
+	UnexpectedStatus(u16),
+	CanNotSerialize,
+	ServerError,
 }
 
 enum Method{
@@ -31,8 +34,7 @@ impl <R>Request<R> where R: Read {
 	}
 
 	fn new(method: Method, body: R) -> Request<R>{
-		Request{
-			method, body,
+		Request{ method, body,
 			expected_status: HTTP_200_OK,
 		}
 	}
@@ -63,16 +65,16 @@ impl Client {
 		match resp {
 			Ok(response) => {
 				if response.status() != request.expected_status {
-					return Err(Error::NoContents);
+					return Err(Error::UnexpectedStatus(response.status()));
 				}
 
 				let result = serde_yaml::from_reader(response.into_reader());
 				match result {
 					Ok(object) => Ok(object),
-					Err(_) => Err(Error::NoContents),
+					Err(_) => Err(Error::CanNotSerialize),
 				}
 			}
-			Err(_) => Err(Error::NoContents),
+			Err(_) => Err(Error::ServerError),
 		}
 	}
 }
@@ -97,9 +99,10 @@ mod unit_tests {
 		let mut client = Client::new("secrettoken");
 		client.api_url = String::from("http://localhost:3000/bot");
 
+		let contents = serde_json::to_string(&Update::default()).unwrap();
 		let request = Request::new(
 			Method::AnswerInlineQuery,
-			StringReader::new("this is a test"));
+			StringReader::new(contents.as_str()));
 
 		let result: Result<Update, Error> = client.call(request);
 		match result {

@@ -7,9 +7,10 @@ struct Inline<'a> {
 }
 
 impl Inline<'_> {
+	// TODO: replace result with valid telegram response (it's not json!)
 	fn answer_inline_query(&self, update: &Update) -> Result<Update, Error>{
 		let answer = new_answer_inline(update);
-		let result = serde_yaml::to_string(&answer);
+		let result = serde_json::to_string(&answer);
 
 		if let Ok(contents) = result {
 			let request = Request::new(
