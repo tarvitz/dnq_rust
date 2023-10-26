@@ -3,7 +3,7 @@ use std::sync::{Mutex, Once};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-static mut QUOTES: Option<Mutex<HashMap<&str, Vec<Quote>>>> = None;
+static mut QUOTES: Option<Mutex<HashMap<String, Vec<Quote>>>> = None;
 static INIT: Once = Once::new();
 
 
@@ -89,40 +89,34 @@ pub struct InlineQuery {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct AnswerInline<'a> {
+pub struct AnswerInline {
 	#[serde(alias = "inline_query_id")]
-	pub id: &'a str,
-	pub results: Vec<AnswerInlineResult<'a>>,
+	pub id: String,
+	pub results: Vec<AnswerInlineResult>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct AnswerInlineResult<'a> {
+pub struct AnswerInlineResult {
 	#[serde(alias = "type")]
-	pub r#type: &'a str,
+	pub r#type: String,
 	pub id: String,
-	pub voice_file_id: Option<&'a str>,
-	pub title: &'a str,
-	pub caption: &'a str
+	pub voice_file_id: Option<String>,
+	pub title: String,
+	pub caption: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Quote<'a> {
-	pub id: &'a str,
-	pub caption: &'a str,
-	pub matches: Vec<&'a str>,
+pub struct Quote {
+	pub id: String,
+	pub caption: String,
+	pub matches: Vec<String>,
 }
 
 // init runs initialization call
-fn quotes<'a>() -> &'static Mutex<HashMap<&'a str, Vec<Quote<'static>>>>{
+pub fn quotes<'a>() -> &'static Mutex<HashMap<String, Vec<Quote>>>{
 	INIT.call_once(||{
 		unsafe {
-			let mut quotes: HashMap<&'a str, Vec<Quote>> = HashMap::new();
-			// add default
-			quotes.insert("", vec![Quote{
-				id: "AwACAgIAAxkDAAMRX3J5RTS6ijieWbCFrX68h8-o4ZoAAg8HAAKguZhLPoXn4iWWE2QbBA",
-				caption: "Come get some!",
-				matches: vec!["come", "get", "some", "come get some", ""],
-			}]);
+			let quotes: HashMap<String, Vec<Quote>> = HashMap::new();
 			QUOTES = Some(Mutex::new(quotes));
 		}
 	});
@@ -130,9 +124,9 @@ fn quotes<'a>() -> &'static Mutex<HashMap<&'a str, Vec<Quote<'static>>>>{
 }
 
 pub fn new_answer_inline(update: &Update) -> AnswerInline {
-	let mut id:&str = "";
+	let mut id: String = String::new();
 	if let Some(q) = &update.inline_query {
-		id = q.id.as_str();
+		id = q.id.clone();
 	}
 
 	return AnswerInline{
@@ -141,8 +135,8 @@ pub fn new_answer_inline(update: &Update) -> AnswerInline {
 	}
 }
 
-fn new_inline_query_result_cached_voice<'a>(update: &Update) -> Vec<AnswerInlineResult<'a>> {
-	let mut query: String = String::from(".X");
+fn new_inline_query_result_cached_voice(update: &Update) -> Vec<AnswerInlineResult> {
+	let mut query: String = ".X".to_string();
 	if let Some(q) = &update.inline_query {
 		query = q.query.to_lowercase();
 	}
@@ -150,19 +144,19 @@ fn new_inline_query_result_cached_voice<'a>(update: &Update) -> Vec<AnswerInline
 	let quotes = quotes().lock().unwrap();
 	let q: Option<&Vec<Quote>>; // = None;
 
-	if !quotes.contains_key(&query.as_str()) {
+	if !quotes.contains_key(&query) {
 		q = quotes.get(""); // default quote
 	} else {
-		q = quotes.get(&query.as_str());
+		q = quotes.get(&query);
 	}
 
 	for quote in q.unwrap().iter() {
 		results.push(AnswerInlineResult{
 			id: Uuid::new_v4().to_string(),
-			r#type: "voice",
-			caption: quote.caption,
-			title: quote.caption,
-			voice_file_id: Some(quote.id),
+			r#type: "voice".to_string(),
+			caption: quote.caption.clone(),
+			title: quote.caption.clone(),
+			voice_file_id: Some(quote.id.clone()),
 		})
 	}
 
@@ -171,17 +165,15 @@ fn new_inline_query_result_cached_voice<'a>(update: &Update) -> Vec<AnswerInline
 }
 
 // TODO: think about decreasing clone ops
-// note Quote<'static> here is used because we manipulate with quotes, which uses 'static!
-pub fn set_quotes(sources: &Vec<Quote<'static>>) {
+pub fn set_quotes(sources: &Vec<Quote>){
 	let mut quotes = quotes().lock().unwrap();
 
 	for quote in sources {
-		for match_key in quote.matches.iter() {
-			if !quotes.contains_key(match_key) {
-				quotes.insert(match_key, vec![]); // init vector
+		for match_key in quote.matches.iter(){
+			if !quotes.contains_key(match_key.as_str()) {
+				quotes.insert(match_key.clone(), vec![]);
 			}
-			quotes.get_mut(match_key).unwrap().push(quote.clone()); // append vector values
-
+			quotes.get_mut(match_key.as_str()).unwrap().push(quote.clone());
 		}
 	}
 
@@ -190,11 +182,25 @@ pub fn set_quotes(sources: &Vec<Quote<'static>>) {
 
 #[cfg(test)]
 mod unit_tests {
-	use crate::objects::{InlineQuery, new_inline_query_result_cached_voice, Quote, quotes, set_quotes, Update};
+	use super::*;
 
-	#[test]
-	fn setup(){
-		assert!(true);
+	static TEST_INIT: Once = Once::new();
+
+	// using quotes but with initial item initializing
+	fn test_quotes() -> &'static Mutex<HashMap<String, Vec<Quote>>>{
+		let mut quotes = quotes();
+
+		TEST_INIT.call_once(move ||{
+			// add default
+			quotes.lock().unwrap().insert("".to_string(), vec![Quote {
+				id: "AwACAgIAAxkDAAMRX3J5RTS6ijieWbCFrX68h8-o4ZoAAg8HAAKguZhLPoXn4iWWE2QbBA".to_string(),
+				caption: "Come get some!".to_string(),
+				matches: vec!["come", "get", "some", "come get some", ""].
+					iter().map(|x| x.to_string()).collect(),
+			}]);
+		});
+
+		quotes
 	}
 
 	// TODO: think about how to keep global quotes.
@@ -202,13 +208,13 @@ mod unit_tests {
 	fn test_new_inline_query_result_cached_voice(){
 		// release lock.
 		{
-			let mut quotes = quotes().lock().unwrap();
+			let mut quotes = test_quotes().lock().unwrap();
 
-			quotes.insert("hehe", vec![
-				Quote{
-					id: "test",
-					caption: "value",
-					matches: vec!["hehe"]
+			quotes.insert("hehe".to_string(), vec![
+				Quote {
+					id: "test".to_string(),
+					caption: "value".to_string(),
+					matches: vec!["hehe".to_string()]
 				}
 			]);
 		}
@@ -216,8 +222,8 @@ mod unit_tests {
 		let update = Update{
 			id: 1337,
 			inline_query: Some(InlineQuery{
-				id: String::from("133733"),
-				query: String::from("hehe"),
+				id: "133733".to_string(),
+				query: "hehe".to_string(),
 				from: None,
 				offset: String::new(),
 			}),
@@ -229,22 +235,22 @@ mod unit_tests {
 	}
 
 	#[test]
-	fn test_set_quotes(){
+	fn test_set_qs(){
 		let new_quotes = vec![
-			Quote{ id: "1", caption: "", matches: vec!["test"] },
-			Quote{ id: "2", caption: "", matches: vec!["me"] },
+			Quote { id: "1".to_string(), caption: "".to_string(), matches: vec!["test".to_string()] },
+			Quote { id: "2".to_string(), caption: "".to_string(), matches: vec!["me".to_string()] },
 		];
 
 		// TODO: we require to calculate the current size of QUOTES object before running
 		//       the test, since we can't guarantee tests running order.
 		//	     Consider to leave it unchanged or simplify somehow.
 		let get_expected= || -> usize {
-			return quotes().lock().unwrap().len();
+			return test_quotes().lock().unwrap().len();
 		};
 		let expected = get_expected();
 
 		set_quotes(&new_quotes);
-		let q = quotes().lock().unwrap();
+		let q = test_quotes().lock().unwrap();
 		assert_eq!(expected + 2, q.len());
 	}
 }

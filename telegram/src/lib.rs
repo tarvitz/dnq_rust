@@ -1,7 +1,8 @@
 use std::io::Read;
 use serde::{Deserialize, Serialize};
+use ureq::Response;
 
-mod objects;
+pub mod objects;
 mod demo;
 mod services;
 
@@ -57,7 +58,7 @@ impl Client {
 		return format!("{}{}/{}", self.api_url.as_str(), self.token, endpoint)
 	}
 
-	fn call<T:Serialize + for<'de> Deserialize<'de>, R:Read>(&self, request: Request<R>) -> Result<T, Error>{
+	fn call<R: Read>(&self, request: Request<R>) -> Result<Response, Error>{
 		let resp = ureq::post(self.url(request.endpoint()).as_str())
 			.set("Content-Type", CONTENT_TYPE_DEFAULT)
 			.send(request.body);
@@ -67,14 +68,23 @@ impl Client {
 				if response.status() != request.expected_status {
 					return Err(Error::UnexpectedStatus(response.status()));
 				}
+				return Ok(response);
+			}
+			Err(_) => Err(Error::ServerError),
+		}
+	}
 
+	fn call_into<T:Serialize + for<'de> Deserialize<'de>, R:Read>(&self, request: Request<R>) -> Result<T, Error>{
+		let result = self.call(request);
+		return match result {
+			Ok(response) => {
 				let result = serde_yaml::from_reader(response.into_reader());
 				match result {
 					Ok(object) => Ok(object),
 					Err(_) => Err(Error::CanNotSerialize),
 				}
 			}
-			Err(_) => Err(Error::ServerError),
+			Err(e) => Err(e),
 		}
 	}
 }
@@ -95,6 +105,24 @@ mod unit_tests {
 
 	#[ignore] // at the present moment this test runs on top of mockoon running side-server.
 	#[test] // works but disabled
+	fn test_client_call_into(){
+		let mut client = Client::new("secrettoken");
+		client.api_url = String::from("http://localhost:3000/bot");
+
+		let contents = serde_json::to_string(&Update::default()).unwrap();
+		let request = Request::new(
+			Method::AnswerInlineQuery,
+			StringReader::new(contents.as_str()));
+
+		let result: Result<Update, Error> = client.call_into(request);
+		match result {
+			Err(_) => assert!(false, "should not return an issue"),
+			Ok(update) => assert_eq!(292124505, update.id),
+		}
+	}
+
+	#[ignore] // at the present moment this test runs on top of mockoon running side-server.
+	#[test] // works but disabled
 	fn test_client_call(){
 		let mut client = Client::new("secrettoken");
 		client.api_url = String::from("http://localhost:3000/bot");
@@ -104,10 +132,9 @@ mod unit_tests {
 			Method::AnswerInlineQuery,
 			StringReader::new(contents.as_str()));
 
-		let result: Result<Update, Error> = client.call(request);
-		match result {
-			Err(_) => assert!(false, "should not return an issue"),
-			Ok(update) => assert_eq!(292124505, update.id),
+		let result: Result<_, Error> = client.call(request);
+		if let Err(_) = result {
+			assert!(false, "should not return an issue");
 		}
 	}
 }

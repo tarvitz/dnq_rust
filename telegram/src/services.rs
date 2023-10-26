@@ -1,3 +1,5 @@
+use std::thread::LocalKey;
+use ureq::Response;
 use stringreader::StringReader;
 use crate::{Client, Error, Method, Request};
 use crate::objects::{new_answer_inline, Update};
@@ -7,8 +9,7 @@ struct Inline<'a> {
 }
 
 impl Inline<'_> {
-	// TODO: replace result with valid telegram response (it's not json!)
-	fn answer_inline_query(&self, update: &Update) -> Result<Update, Error>{
+	fn answer_inline_query(&self, update: &Update) -> Result<Response, Error>{
 		let answer = new_answer_inline(update);
 		let result = serde_json::to_string(&answer);
 
@@ -35,9 +36,10 @@ mod unit_tests {
 		let mut client = Client::new("secrettoken");
 		client.api_url = String::from("http://localhost:3000/bot");
 		let inline = Inline{client: &client};
-		let result: Result<Update, Error> = inline.answer_inline_query(&Update::default());
+		let result: Result<Response, Error> = inline.answer_inline_query(&Update::default());
+
 		match result {
-			Ok(up) => assert_eq!(292124505, up.id),
+			Ok(_) => assert!(true),
 			Err(_) => assert!(false, "got error"),
 		}
 	}

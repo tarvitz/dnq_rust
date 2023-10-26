@@ -1,0 +1,146 @@
+admin-token: thisIsASecret
+quotes:
+- id: "AwACAgIAAxkDAAMRX3J5RTS6ijieWbCFrX68h8-o4ZoAAg8HAAKguZhLPoXn4iWWE2QbBA"
+  caption: "Come get some!"
+  #: "" for default
+  matches: ["come", "get", "some", "come get some", ""]
+- id: "AwACAgIAAxkDAAMJX2-0Hy9d4Wzj3iTgL6LQokyJThMAAl0KAAKIq4FLr4gocayKwSQbBA"
+  caption: "Groovy!"
+  matches: ["groovy"]
+- id: "AwACAgIAAxkDAAMGX2-bNr_1MqskMXuiXUY28twqXj0AAk0KAAKIq4FLkefH6hK8oucbBA"
+  caption: "I kick ass for the Lord!"
+  matches: ["i kick ass", "ass", "lord"]
+- id: "AwACAgIAAxkDAAMTX3J-hdpRy8LwRcPv4piJ-nL0u_UAAhIHAAKguZhLA0RNKq0dvNIbBA"
+  caption: "Dike wins, FATALITY"
+  matches: ["win", "fatality"]
+- id: "AwACAgIAAxkDAAMUX3J_XsgsSwQoFI0KanM42dLfIokAAhcHAAKguZhLgbcu_ChUiVYbBA"
+  caption: "Ha-ha, that never gets old!"
+  matches: ["haha", "lol"]
+- id: "AwACAgIAAxkDAAMVX3m--xYKLFLzyvr54__SS5DDJGAAAi4IAAJgG9BLwR3pDPW5EM4bBA"
+  caption: "Have a taste of my ball!"
+  matches: ["taste", "ball"]
+- id: "AwACAgIAAxkDAAMWX3okXL1AZ-aOQTpL2t-7tExt2YIAArMIAAJgG9BLmWJEVGtI5hwbBA"
+  caption: "What the fuck?!"
+  matches: ["wtf", "fuck"]
+- id: "AwACAgIAAxkDAAMXX3omhPU1HV9XDCo4tDVLcWic9AcAArQIAAJgG9BLZzXjS8tlYg4bBA"
+  caption: "Fuck YEAH!"
+  matches: ["fuck", "yeah"]
+- id: "AwACAgIAAxkDAAMYX3oooJIVGi_JRP9SnuvwshNiqIoAArUIAAJgG9BLdED9HxbAFKQbBA"
+  caption: "Take a bite of Duke's special pain cake!"
+  matches: ["cake", "pain"]
+- id: "AwACAgIAAxkDAAMZX3sgMh5lz0OHKaZ7lWytWo5RM2UAAvsHAAI1TOBLLrrbxVHm_ZsbBA"
+  caption: "Damn it Leroy, you're one ugly motherfucker!"
+  matches: ["damn", "leroy"]
+
+#: since that moment appending config goes over `dnq upload`
+- id: AwACAgIAAxkDAAMaX3t9aezB3wswOZmv4HSuVgEpkyoAAj8JAAI1TOBLSEfQeLjELxIbBA
+  caption: You about as tough as a piss flavoured popsicle
+  matches:
+    - popsicle
+    - tough
+    - piss
+
+- id: AwACAgIAAxkDAAMbX3t_sLOM0sKYEnXOJbv8JNe3haMAAkIJAAI1TOBLHMNmPheZQiIbBA
+  caption: Take a teleport to HELL!
+  matches:
+  - hell
+  - teleport
+
+- id: AwACAgIAAxkDAAMcX3uBLucRX4tD2SEZwnyOM329GSMAAkUJAAI1TOBLWSdcjuVrhSAbBA
+  caption: Put that thing AWAY
+  matches:
+  - away
+  - put
+
+- id: AwACAgIAAxkDAAMdX3uDFeFVbKzO8eIJt_k1Au_ZRtkAAkYJAAI1TOBL7ELsXszYLskbBA
+  caption: I lied
+  matches:
+  - lied
+
+- id: AwACAgIAAxkDAAMeX3uDgc0z8MBOAeJ7kXhbvbe32TEAAkgJAAI1TOBLySeYVL8AAUJ7GwQ
+  caption: If I promis to kill you last?
+  matches:
+  - kill
+  - last
+- id: AwACAgIAAxkDAAMfX3uE92mJyukX68N3tymuphX6G6YAAk4JAAI1TOBLRUsJxoJyz9UbBA
+  caption: And this little piggy.. WENT TO HELL
+  matches:
+  - hell
+  - piggy
+
+- id: AwACAgIAAxkDAAMgX3uFuWVz9v-x7fq9mjiF8od00V0AAlAJAAI1TOBL2Ku9fLsQ-LUbBA
+  caption: I've got a bad feeling about this
+  matches:
+  - bad
+  - feeling
+
+- id: AwACAgIAAxkDAAMhX3uG9Z38YcuEnJplEkK0-lzrnpQAAlMJAAI1TOBL90Qcho8IYWsbBA
+  caption: Now I've got really bad feeling about this
+  matches:
+  - bad
+  - feeling
+
+- id: AwACAgIAAxkDAAMiX3uLtSvL8egOeXYV3MUopRjgZMEAAlQJAAI1TOBLvulrIGuVwKkbBA
+  caption: I was born ready
+  matches:
+  - ready
+
+- id: AwACAgIAAxkDAAMjX3uMtIxpNBm730F7bTo-F-btmLYAAlUJAAI1TOBLlDjc_akUYKgbBA
+  caption: Step right up and get some!
+  matches:
+  - get
+  - some
+
+- id: AwACAgIAAxkDAAMkX3uN24IAAWG8cHq1Lzj2NW0bARxiAAJWCQACNUzgSz79d5kKsa7kGwQ
+  caption: I like it!
+  matches:
+  - i
+  - like
+- id: AwACAgIAAxkDAAMlX3xVYVXKC2Y7bTkh47XxKQbiJEsAAtQHAAI1TOhLqZZ_Fk1Hg_sbBA
+  caption: Same shit different day
+  matches:
+  - shit
+  - same
+
+- id: AwACAgIAAxkDAAMmX3xjf5_yOGqtLXSza-tFtEtc5aUAAuwHAAI1TOhL2QOS2Tw-b4EbBA
+  caption: Time to stop pissing around and bring this guy back to the action
+  matches:
+  - piss
+  - action
+  - around
+  - time
+
+- id: AwACAgIAAxkDAAMnX3yfCmAyjUnTuacPXiwPRwABn62uAAJqCAACNUzoSySuUV_4J_eVGwQ
+  caption: Oh no! What am I doing?
+  matches:
+  - "no"
+  - oh
+
+- id: AwACAgIAAxkDAAMoX32Fpz6AoyeVavnW8y7HlOK09C8AApEHAAITzfFL6e4D0EBuf6gbBA
+  caption: Not everyone on my team can be as good as me
+  matches:
+  - team
+  - good
+  - me
+
+- id: AwACAgIAAxkDAAMrX3-bIz40rY9LvYBEw7_IsYZg8GUAAgkIAAK-HQFIXotTjdYFP5wbBA
+  caption: "Damn, I'm looking good!"
+  matches:
+  - damn
+  - good
+
+- id: AwACAgIAAxkDAAMuX4AxZqaxDsbH84jC4K5GOEiYGA0AAmsIAAK-HQFIZUXemmQ-EOsbBA
+  caption: "Ha-ha-ha-ha!"
+  matches:
+  - haha
+  - ha-ha
+
+- id: AwACAgIAAxkDAAMvX4BUFSiffYWnBDeaRjuo0hDj4EMAArgIAAK-HQlInnoNp96JvRobBA
+  caption: What a mess!
+  matches:
+  - mess
+
+- id: AwACAgIAAxkDAAMzX4ICDLk-BdYO1ce_sz0Fdy9o-ngAAngKAAKmRBFI0AdUqZbbDLsbBA
+  caption: My job is to kick ass
+  matches:
+  - job

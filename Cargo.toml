@@ -13,6 +13,10 @@ env_logger = "0.10.0"
 log = "0.4.20"
 # without TLS/SSL
 actix-web = {version = "4"}
+serde = { version = "1.0.189", features = ["derive"] }
+serde_yaml = "0.9.25"
+serde_json = "1.0.107"
+stringreader = "0.1.1"
 #: with TLS/SSL
 # actix-web = { version = "4", features = ["openssl"] }
 # openssl = {version = "0.10"}
