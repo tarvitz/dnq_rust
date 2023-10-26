@@ -1,10 +1,17 @@
 use std::io::Read;
 use serde::{Deserialize, Serialize};
+use stringreader::StringReader;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Container<'a> {
 	id: &'a str,
 	contents: Vec<&'a str>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Object {
+	id: String,
+	contents: Vec<String>
 }
 
 #[cfg(test)]
@@ -90,11 +97,26 @@ impl <'a>Poster<'a> {
 	}
 }
 
+struct Inline<'a> {
+	client: &'a Poster<'a>
+}
+
+impl Inline<'_> {
+	fn inline(&self) -> Result<Object, Error> {
+		let request = Request {
+			body: StringReader::new("contents"),
+			method: "kek",
+		};
+
+		return self.client.call(request);
+	}
+}
+
 #[cfg(test)]
 mod unit_tests_two {
+	use super::*;
 	use stringreader::StringReader;
 	use crate::objects::Update;
-	use super::*;
 
 	#[test]
 	fn test_call_one() {
@@ -106,6 +128,17 @@ mod unit_tests_two {
 				assert_eq!(292124505, update.id)
 			},
 			Err(e) => assert!(false, "{}", format!("got issue: {}", e.message)),
+		}
+	}
+
+	#[test]
+	fn test_inline(){
+		let client = Poster{api_url: "http://localhost:3000/poster", token: "secrettoken"};
+		let inline = Inline{client: &client};
+		let result = inline.inline();
+		match result{
+			Ok(container) => assert_eq!("1337", container.id),
+			Err(_) => assert!(false, "got error"),
 		}
 	}
 }
