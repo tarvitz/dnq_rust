@@ -2,7 +2,6 @@ pub mod endpoints;
 pub mod utils;
 
 use std::fs;
-use std::io::Read;
 use crate::utils::env::Env as E;
 
 static DEFAULT_ADDR: &str = "0.0.0.0:8443";
@@ -32,7 +31,7 @@ pub enum Error {
 pub struct Config {
 	pub token: String,
 	pub address: String,
-	pub workers: u32,
+	pub workers: u8,
 	pub quotes: String,
 }
 
@@ -45,17 +44,6 @@ impl Config {
 			quotes: E::with("DNQ_QUOTES", String::from("config.yaml")).get(),
 		}
 	}
-
-	// works but makes no sense
-	// pub fn with_address(mut self, new_address: &str) -> Self {
-	// 	self.address = String::from(new_address);
-	// 	return self
-	// }
-
-	//
-	// pub fn set_address(&mut self, new_address: &str) {
-	// 	self.address = String::from(new_address);
-	// }
 }
 
 #[derive(Debug, Deserialize)]

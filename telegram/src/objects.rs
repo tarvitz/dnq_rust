@@ -187,8 +187,8 @@ mod unit_tests {
 	static TEST_INIT: Once = Once::new();
 
 	// using quotes but with initial item initializing
-	fn test_quotes() -> &'static Mutex<HashMap<String, Vec<Quote>>>{
-		let mut quotes = quotes();
+	fn quotes() -> &'static Mutex<HashMap<String, Vec<Quote>>>{
+		let mut quotes = crate::objects::quotes();
 
 		TEST_INIT.call_once(move ||{
 			// add default
@@ -208,7 +208,7 @@ mod unit_tests {
 	fn test_new_inline_query_result_cached_voice(){
 		// release lock.
 		{
-			let mut quotes = test_quotes().lock().unwrap();
+			let mut quotes = quotes().lock().unwrap();
 
 			quotes.insert("hehe".to_string(), vec![
 				Quote {
@@ -235,7 +235,7 @@ mod unit_tests {
 	}
 
 	#[test]
-	fn test_set_qs(){
+	fn test_set_quotes(){
 		let new_quotes = vec![
 			Quote { id: "1".to_string(), caption: "".to_string(), matches: vec!["test".to_string()] },
 			Quote { id: "2".to_string(), caption: "".to_string(), matches: vec!["me".to_string()] },
@@ -245,12 +245,12 @@ mod unit_tests {
 		//       the test, since we can't guarantee tests running order.
 		//	     Consider to leave it unchanged or simplify somehow.
 		let get_expected= || -> usize {
-			return test_quotes().lock().unwrap().len();
+			return quotes().lock().unwrap().len();
 		};
 		let expected = get_expected();
 
 		set_quotes(&new_quotes);
-		let q = test_quotes().lock().unwrap();
+		let q = quotes().lock().unwrap();
 		assert_eq!(expected + 2, q.len());
 	}
 }

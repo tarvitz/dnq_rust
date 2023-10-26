@@ -1,4 +1,3 @@
-use std::thread::LocalKey;
 use ureq::Response;
 use stringreader::StringReader;
 use crate::{Client, Error, Method, Request};

@@ -1,7 +1,6 @@
 use dnq;
 use actix_web::{App, HttpServer};
 use log::{info, error};
-use telegram::objects::quotes;
 
 /*
 #[cfg(feature = "openssl")]
@@ -22,15 +21,16 @@ async fn main() -> std::io::Result<()>{
 	let loaded = dnq::load_quotes(&config);
 	match loaded {
 		Ok(amount) => info!("loading quotes: {}", amount),
-		Err(e) => error!("issue on initializing"),
+		Err(_) => error!("issue on initializing"),
 	};
 
 	HttpServer::new(||{
 		App::new()
 			.service(dnq::endpoints::hello)
 			.service(dnq::endpoints::readyz)
+			.service(dnq::endpoints::answer)
 	})
-		.workers(8)
+		.workers(config.workers as usize)
 		.bind(config.address.as_str())?
 		.run()
 		.await

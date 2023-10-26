@@ -11,7 +11,6 @@ fn main() -> Result<(), ureq::Error>{
 			println!("got error: {}", e);
 		}
 	}
-	// println!("body: {}", body);
 
 	Ok(())
 }
